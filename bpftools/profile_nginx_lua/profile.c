@@ -874,6 +874,10 @@ int main(int argc, char **argv)
 	if (err)
 		goto cleanup;
 
+	if (env.duration > 0) {
+		signal(SIGALRM, sig_handler);
+		alarm(env.duration);
+	}
 	signal(SIGINT, sig_handler);
 
 	if (env.pid != -1)
@@ -905,7 +909,6 @@ int main(int argc, char **argv)
 	 * We'll get sleep interrupted when someone presses Ctrl-C (which will
 	 * be "handled" with noop by sig_handler).
 	 */
-	// sleep(env.duration);
 	while (!exiting)
 	{
 		// print perf event to get stack trace
