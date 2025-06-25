@@ -86,6 +86,10 @@ static inline int lua_get_funcdata(struct bpf_perf_event_data *ctx, cTValue *fra
 		const char *src = strdata(name);
 		if (!src)
 			return -1;
+		MSize len = BPF_PROBE_READ_USER(name, len);
+		if (!len) {
+			return -1;
+		}
 		bpf_probe_read_user_str(eventp->name, sizeof(eventp->name), src);
 		//bpf_printk("level= %d, fn_name=%s\n", level, eventp->name);
 	}
@@ -139,7 +143,7 @@ static int fix_lua_stack(struct bpf_perf_event_data *ctx, __u32 tid, int stack_i
 		if (level-- == 0)
 		{
 			level++;
-			// *size = (nextframe - frame);
+ 			// *size = (nextframe - frame);
 			/* Level found. */
 			if (lua_get_funcdata(ctx, frame, eventp, count) != 0)
 			{
